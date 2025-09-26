@@ -1,2 +1,2 @@
 # training-ground
-Workspace for database and algorithms training
+Workspace for dsa and system design training
