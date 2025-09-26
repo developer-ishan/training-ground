@@ -1,7 +1,3 @@
-Here’s a draft for your Substack post:
-
----
-
 ## How to Build a Simple Database: Bash CLI vs Java (Indexed & Non-Indexed)
 
 ### 1. Creating a Simple Database Using Bash CLI
