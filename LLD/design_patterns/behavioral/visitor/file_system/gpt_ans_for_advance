@@ -1,0 +1,356 @@
+// ==================== Composite Pattern ====================
+package filesystem.core;
+
+import filesystem.operations.Visitor;
+
+public interface FileSystemElement {
+    String getName();
+    void accept(Visitor visitor);
+}
+
+package filesystem.core;
+
+import filesystem.operations.Visitor;
+
+public class File implements FileSystemElement {
+    private final String name;
+    private final int size;
+
+    public File(String name, int size) {
+        this.name = name;
+        this.size = size;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
+    }
+}
+
+package filesystem.core;
+
+import filesystem.operations.Visitor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Folder implements FileSystemElement {
+    private final String name;
+    private final List<FileSystemElement> children = new ArrayList<>();
+
+    public Folder(String name) {
+        this.name = name;
+    }
+
+    public void add(FileSystemElement element) {
+        children.add(element);
+    }
+
+    public List<FileSystemElement> getChildren() {
+        return children;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
+    }
+}
+
+// ==================== Visitor Pattern ====================
+package filesystem.operations;
+
+import filesystem.core.File;
+import filesystem.core.Folder;
+
+public interface Visitor {
+    void visit(File file);
+    void visit(Folder folder);
+}
+
+package filesystem.operations;
+
+import filesystem.core.File;
+import filesystem.core.FileSystemElement;
+import filesystem.core.Folder;
+
+public class SizeCalculatorVisitor implements Visitor {
+    private int totalSize = 0;
+
+    public int getTotalSize() {
+        return totalSize;
+    }
+
+    @Override
+    public void visit(File file) {
+        totalSize += file.getSize();
+    }
+
+    @Override
+    public void visit(Folder folder) {
+        for (FileSystemElement element : folder.getChildren()) {
+            element.accept(this);
+        }
+    }
+}
+
+package filesystem.operations;
+
+import filesystem.core.File;
+import filesystem.core.FileSystemElement;
+import filesystem.core.Folder;
+
+public class ListingVisitor implements Visitor {
+    private int indent = 0;
+
+    private void printIndent() {
+        for (int i = 0; i < indent; i++) System.out.print("  ");
+    }
+
+    @Override
+    public void visit(File file) {
+        printIndent();
+        System.out.println("File: " + file.getName());
+    }
+
+    @Override
+    public void visit(Folder folder) {
+        printIndent();
+        System.out.println("Folder: " + folder.getName());
+        indent++;
+        for (FileSystemElement element : folder.getChildren()) {
+            element.accept(this);
+        }
+        indent--;
+    }
+}
+
+// ==================== Command Pattern ====================
+package filesystem.operations;
+
+public interface Command {
+    void execute();
+    void undo();
+}
+
+package filesystem.operations;
+
+import filesystem.core.Folder;
+import filesystem.core.FileSystemElement;
+
+public class CreateCommand implements Command {
+    private final Folder parent;
+    private final FileSystemElement element;
+
+    public CreateCommand(Folder parent, FileSystemElement element) {
+        this.parent = parent;
+        this.element = element;
+    }
+
+    @Override
+    public void execute() {
+        parent.add(element);
+    }
+
+    @Override
+    public void undo() {
+        parent.getChildren().remove(element);
+    }
+}
+
+package filesystem.operations;
+
+import java.util.Stack;
+
+public class CommandHistory {
+    private final Stack<Command> history = new Stack<>();
+
+    public void execute(Command command) {
+        command.execute();
+        history.push(command);
+    }
+
+    public void undo() {
+        if (!history.isEmpty()) {
+            history.pop().undo();
+        }
+    }
+}
+
+// ==================== Factory Pattern ====================
+package filesystem.creation;
+
+import filesystem.core.File;
+import filesystem.core.Folder;
+
+public class FileSystemFactory {
+    public static File createFile(String name, int size) {
+        return new File(name, size);
+    }
+
+    public static Folder createFolder(String name) {
+        return new Folder(name);
+    }
+}
+
+// ==================== Strategy Pattern ====================
+package filesystem.behaviors;
+
+public interface CompressionStrategy {
+    void compress(String fileName);
+}
+
+package filesystem.behaviors;
+
+public class ZipCompression implements CompressionStrategy {
+    @Override
+    public void compress(String fileName) {
+        System.out.println("Compressing " + fileName + " using ZIP.");
+    }
+}
+
+// ==================== Observer Pattern ====================
+package filesystem.events;
+
+public interface Observer {
+    void onChange(String event);
+}
+
+package filesystem.events;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Observable {
+    private final List<Observer> observers = new ArrayList<>();
+
+    public void addObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    public void notifyObservers(String event) {
+        for (Observer o : observers) o.onChange(event);
+    }
+}
+
+package filesystem.events;
+
+public class FileSystemEventLogger implements Observer {
+    @Override
+    public void onChange(String event) {
+        System.out.println("[LOG]: " + event);
+    }
+}
+
+// ==================== Proxy Pattern ====================
+package filesystem.proxy;
+
+import filesystem.core.FileSystemElement;
+import filesystem.core.Folder;
+
+public class SecureFileSystemProxy {
+    private final Folder root;
+    private final String userRole;
+
+    public SecureFileSystemProxy(Folder root, String userRole) {
+        this.root = root;
+        this.userRole = userRole;
+    }
+
+    public void list() {
+        if (!"admin".equals(userRole)) {
+            System.out.println("Access denied.");
+            return;
+        }
+        root.accept(new filesystem.operations.ListingVisitor());
+    }
+}
+
+// ==================== Builder Pattern ====================
+package filesystem.creation;
+
+import filesystem.core.File;
+import filesystem.core.FileSystemElement;
+import filesystem.core.Folder;
+
+public class FileSystemBuilder {
+    private final Folder root;
+
+    public FileSystemBuilder(String rootName) {
+        this.root = new Folder(rootName);
+    }
+
+    public FileSystemBuilder addFile(String name, int size) {
+        root.add(new File(name, size));
+        return this;
+    }
+
+    public FileSystemBuilder addFolder(Folder folder) {
+        root.add(folder);
+        return this;
+    }
+
+    public Folder build() {
+        return root;
+    }
+}
+
+// ==================== Main ====================
+package filesystem;
+
+import filesystem.core.*;
+        import filesystem.creation.*;
+        import filesystem.events.*;
+        import filesystem.operations.*;
+        import filesystem.proxy.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Folder root = new FileSystemBuilder("root")
+                .addFile("readme.txt", 10)
+                .addFile("config.yml", 5)
+                .addFolder(new FileSystemBuilder("src")
+                        .addFile("Main.java", 20)
+                        .addFile("Utils.java", 15)
+                        .build())
+                .build();
+
+        // Observer
+        Observable observable = new Observable();
+        observable.addObserver(new FileSystemEventLogger());
+        observable.notifyObservers("Root folder initialized.");
+
+        // Visitor
+        SizeCalculatorVisitor sizeVisitor = new SizeCalculatorVisitor();
+        root.accept(sizeVisitor);
+        System.out.println("Total size: " + sizeVisitor.getTotalSize());
+
+        // Proxy
+        SecureFileSystemProxy proxy = new SecureFileSystemProxy(root, "admin");
+        proxy.list();
+
+        // Command
+        CommandHistory history = new CommandHistory();
+        Folder docs = new Folder("docs");
+        Command createDocs = new CreateCommand(root, docs);
+        history.execute(createDocs);
+        root.accept(new ListingVisitor());
+
+        System.out.println("Undoing create...");
+        history.undo();
+        root.accept(new ListingVisitor());
+    }
+}

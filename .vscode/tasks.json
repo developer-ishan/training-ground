@@ -1,0 +1,30 @@
+{
+  "tasks": [
+    {
+      "type": "cppbuild",
+      "label": "C/C++: clang build active file with bits",
+      "command": "/usr/bin/clang++",
+      "args": [
+        "-I", "${env:HOME}/include",
+        "-fcolor-diagnostics",
+        "-fansi-escape-codes",
+        "-g",
+        "${file}",
+        "-o",
+        "${fileDirname}/${fileBasenameNoExtension}"
+      ],
+      "options": {
+        "cwd": "${fileDirname}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "Task modified to support bits/stdc++.h."
+    }
+  ],
+  "version": "2.0.0"
+}
