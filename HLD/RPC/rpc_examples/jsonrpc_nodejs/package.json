@@ -1,0 +1,14 @@
+{
+  "name": "jsonrpc-example",
+  "version": "1.0.0",
+  "description": "JSON-RPC 2.0 server and client example",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "client": "node client.js"
+  },
+  "keywords": ["jsonrpc", "rpc", "example"],
+  "author": "",
+  "license": "MIT"
+}
+

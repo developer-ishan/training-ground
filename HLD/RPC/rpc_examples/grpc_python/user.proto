@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package user;
+
+// User service definition
+service UserService {
+  // Unary RPC: single request, single response
+  rpc GetUser(GetUserRequest) returns (User);
+  
+  // Unary RPC: create a new user
+  rpc CreateUser(CreateUserRequest) returns (User);
+  
+  // Server streaming: single request, stream of responses
+  rpc ListUsers(ListUsersRequest) returns (stream User);
+  
+  // Client streaming: stream of requests, single response
+  rpc CreateUsers(stream CreateUserRequest) returns (CreateUsersResponse);
+  
+  // Bidirectional streaming: stream of requests, stream of responses
+  rpc Chat(stream ChatMessage) returns (stream ChatMessage);
+}
+
+// Request to get a user by ID
+message GetUserRequest {
+  int32 user_id = 1;
+}
+
+// Request to create a new user
+message CreateUserRequest {
+  string name = 1;
+  string email = 2;
+}
+
+// Request to list users
+message ListUsersRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+// User message
+message User {
+  int32 id = 1;
+  string name = 2;
+  string email = 3;
+  int64 created_at = 4;
+}
+
+// Response for creating multiple users
+message CreateUsersResponse {
+  int32 count = 1;
+  repeated User users = 2;
+}
+
+// Chat message for bidirectional streaming
+message ChatMessage {
+  string user = 1;
+  string message = 2;
+  int64 timestamp = 3;
+}
+
