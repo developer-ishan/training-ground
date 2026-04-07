@@ -1,0 +1,5 @@
+healthcheck/WindowedHealthStrategyTest.class
+context/ModelContextTransitionTest.class
+gateway/GatewayDispatchFailureTest.class
+healthcheck/ConsecutiveHealthStrategyTest.class
+gateway/GatewayRoutingTest.class

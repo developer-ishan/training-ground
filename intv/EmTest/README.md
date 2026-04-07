@@ -1,0 +1,2 @@
+- **`practice/`** — formal problem statement for solo practice: [practice/QUESTION.md](practice/QUESTION.md) · [practice/README.md](practice/README.md)
+- **`interview/`** — reference solution, build instructions, tests: [interview/README.md](interview/README.md)
