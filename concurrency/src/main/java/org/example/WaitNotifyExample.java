@@ -21,7 +21,7 @@ class SharedResource {
 
 }
 public class WaitNotifyExample {
-    static void main() {
+    public static void main(String[] args) {
         SharedResource sr = new SharedResource();
 
         Thread t1 = new Thread(()->sr.waitExample(), "Thread-1");
